@@ -636,11 +636,21 @@ def drawArray(canvas, width, height, array, positions):
     canvas.after(0, draw)
 
 def allSort(canvases, width, height, arrays, delay, selected_algorithms):
-    global algorithms
+    global algorithms, active_threads
 
     for i in range(len(selected_algorithms)):
-        threading.Thread(target=algorithms[selected_algorithms[i]], args=(canvases[i], width, height, arrays[i], delay)).start()
+        thread = threading.Thread(target=algorithms[selected_algorithms[i]], args=(canvases[i], width, height, arrays[i], delay))
+        thread.daemon = True  # Mark thread as daemon so it exits when main thread exits
+        active_threads.append(thread)
+        thread.start()
 
+def start_algorithm_thread(algorithm_name, canvas, width, height, array, delay):
+    global algorithms, active_threads
+    
+    thread = threading.Thread(target=algorithms[algorithm_name], args=(canvas, width, height, array, delay))
+    thread.daemon = True  # Mark thread as daemon so it exits when main thread exits
+    active_threads.append(thread)
+    thread.start()
 
 def chooseColor(color_type):
         global bgcol, element_color, highlight_color, bg_color_btn, element_color_btn, highlight_color_btn
@@ -682,31 +692,36 @@ def saveSettings():
 
 def loadSettings():
     global settings, array_size_var, delay_var, randomize_var, bgcol, element_color, highlight_color, alg_vars
-    global bg_color_btn, element_color_btn, highlight_color_btng
+    global bg_color_btn, element_color_btn, highlight_color_btn
 
-    with open("settings.json", "r") as file:
-        settings = json.load(file)
+    try:
+        with open("settings.json", "r") as file:
+            settings = json.load(file)
 
-    array_size_var.set(settings["array_size"])
-    delay_var.set(settings["delay"])
-    randomize_var.set(settings["randomize"])
+        array_size_var.set(settings["array_size"])
+        delay_var.set(settings["delay"])
+        randomize_var.set(settings["randomize"])
 
-    bgcol = settings["bgcol"]
-    element_color = settings["element_color"]
-    highlight_color = settings["highlight_color"]
+        bgcol = settings["bgcol"]
+        element_color = settings["element_color"]
+        highlight_color = settings["highlight_color"]
 
-    # Update GUI
-    if bg_color_btn:
-        bg_color_btn.config(bg=bgcol)
-        element_color_btn.config(bg=element_color)
-        highlight_color_btn.config(bg=highlight_color)
+        # Update GUI
+        if bg_color_btn:
+            bg_color_btn.config(bg=bgcol)
+            element_color_btn.config(bg=element_color)
+            highlight_color_btn.config(bg=highlight_color)
 
-    for alg_name, var in settings["alg_vars"].items():
-        alg_vars[alg_name].set(var)
+        for alg_name, var in settings["alg_vars"].items():
+            if alg_name in alg_vars:
+                alg_vars[alg_name].set(var)
+
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
 
 def generateVisualizations():
     global alg_vars, array_size_var, delay_var, randomize_var, algorithms
-    global bgcol, element_color, highlight_color
+    global bgcol, element_color, highlight_color, active_threads
 
     # Set up variables for rendering
     selected_algorithms = []
@@ -777,10 +792,22 @@ def generateVisualizations():
     for i in range(algs-1):
         arrays.append(sorting_array.copy())
 
+    # Clean up any existing threads before creating a new window
+    active_threads = []
+
     # Window
-    root = tk.Tk()
+    root = tk.Toplevel(settings_root)  # Use Toplevel instead of Tk
     root.title("Sorting Algorithm Visualization")
     root.geometry(f"{cols * 640}x{rows * 540 + (10 if algs > 1 else -30)}")
+    
+    # Set up the window close handler
+    def on_close():
+        global active_threads
+
+        active_threads = []
+        root.destroy()
+    
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
     # Algorithms
     for i in range(algs):
@@ -792,8 +819,9 @@ def generateVisualizations():
 
         drawArray(canvases[i], width, height, arrays[i], [-2])
 
+        # For each algorithm button, create thread with daemon=True
         buttonses[i] = tk.Button(root, text="Sort", font=("Arial", 16),
-            command=lambda i=i: threading.Thread(target=algorithms[selected_algorithms[i]], args=(canvases[i], width, height, arrays[i], delay)).start())
+            command=lambda i=i: start_algorithm_thread(selected_algorithms[i], canvases[i], width, height, arrays[i], delay))
         buttonses[i].grid(row=positions[i]["r"] + 2, column=positions[i]["c"])
 
         buttonrs[i] = tk.Button(root, text="Randomize", font=("Arial", 16), command=lambda i=i: randomizeArray([canvases[i]], width, height, [arrays[i]]))
@@ -806,8 +834,13 @@ def generateVisualizations():
 
         buttonrall = tk.Button(root, text="Randomize All", font=("Arial", 16), command=lambda: randomizeArray(canvases, width, height, arrays))
         buttonrall.grid(row=rows*3, column=1, pady=5)
-    
-    root.mainloop()
+
+# Handle cleanup when the settings window is closed
+def on_settings_close():
+    global active_threads
+
+    active_threads = []
+    settings_root.destroy()
 
 
 algorithms = {
@@ -833,13 +866,26 @@ algorithms = {
 settings_root = tk.Tk()
 settings_root.title("Sorting Algorithm Visualizer - Settings")
 settings_root.geometry("660x340")
-array_size_var = tk.IntVar(value=int())
-delay_var = tk.DoubleVar(value=float())
-randomize_var = tk.BooleanVar(value=bool())
 
-bgcol = str()
-element_color = str()
-highlight_color = str()
+array_size_var = tk.IntVar(value=50)  # Default value
+delay_var = tk.DoubleVar(value=0.05)  # Default value
+randomize_var = tk.BooleanVar(value=True)  # Default value
+
+# Default colors
+bgcol = "#ffffff"  # White
+element_color = "#3498db"  # Blue
+highlight_color = "#e74c3c"  # Red
+
+# Create default settings if not loaded
+settings = {
+    "array_size": 50,
+    "delay": 0.05,
+    "randomize": True,
+    "bgcol": bgcol,
+    "element_color": element_color,
+    "highlight_color": highlight_color,
+    "alg_vars": {}
+}
 
 # Placeholders for loadSettings
 bg_color_btn = None
@@ -850,9 +896,13 @@ alg_vars = {}
 for alg_name in algorithms.keys():
     var = tk.BooleanVar(value=False)
     alg_vars[alg_name] = var
+    settings["alg_vars"][alg_name] = False
 
+# Try to load settings, but use defaults if it fails
 loadSettings()
 
+# Keep track of active threads
+active_threads = []
 
 settings_frame = tk.LabelFrame(settings_root, text="Visualization Settings", padx=10, pady=10, font=("Arial", 12))
 settings_frame.pack(fill=tk.X, padx=10, pady=10)
@@ -889,7 +939,6 @@ highlight_color_btn = tk.Button(settings_frame, text="Choose", bg=highlight_colo
                                 command=lambda: chooseColor("highlight"))
 highlight_color_btn.grid(row=1, column=5, sticky="w", padx=5, pady=5)
 
-
 alg_frame = tk.LabelFrame(settings_root, text="Select Algorithms to Compare", padx=10, pady=10, font=("Arial", 12))
 alg_frame.pack(fill=tk.X, padx=10, pady=10)
 
@@ -910,5 +959,7 @@ load_settings_btn = tk.Button(settings_root, text="Load Settings",
                     command=loadSettings, font=("Arial", 12))
 load_settings_btn.pack(side=tk.LEFT, padx=5, pady=5)
 
+
+settings_root.protocol("WM_DELETE_WINDOW", on_settings_close)
 
 settings_root.mainloop()
