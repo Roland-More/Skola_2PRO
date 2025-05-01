@@ -1,0 +1,26 @@
+{
+    "array_size": 70,
+    "delay": 0.01,
+    "randomize": true,
+    "bgcol": "white",
+    "element_color": "orange red",
+    "highlight_color": "peach puff",
+    "alg_vars": {
+        "Bubble Sort": false,
+        "Odd-Even Sort": false,
+        "Cocktail Sort": false,
+        "Pancake Sort": false,
+        "Comb Sort": false,
+        "Selection Sort": false,
+        "Gnome Sort": false,
+        "Insertion Sort": true,
+        "Shell Sort": false,
+        "Stooge Sort": false,
+        "Heap Sort": false,
+        "Merge Sort": false,
+        "Tim Sort": false,
+        "Quick Sort": true,
+        "Intro Sort": false,
+        "Radix Sort": true
+    }
+}

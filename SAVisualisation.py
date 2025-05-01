@@ -4,6 +4,7 @@ import threading
 import time
 import random
 import math
+import json
 
 
 def bubbleSort(canvas, width, height, array, delay):
@@ -662,6 +663,47 @@ def chooseColor(color_type):
                 highlight_color = color
                 highlight_color_btn.config(bg=color)
 
+def saveSettings():
+    global settings, array_size_var, delay_var, randomize_var, alg_vars
+    global bgcol, element_color, highlight_color
+
+    settings["array_size"] = array_size_var.get()
+    settings["delay"] = delay_var.get()
+    settings["randomize"] = randomize_var.get()
+    settings["bgcol"] = bgcol
+    settings["element_color"] = element_color
+    settings["highlight_color"] = highlight_color
+
+    for alg_name, var in alg_vars.items():
+        settings["alg_vars"][alg_name] = var.get()
+
+    with open("settings.json", "w") as file:
+        json.dump(settings, file, indent=4)        
+
+def loadSettings():
+    global settings, array_size_var, delay_var, randomize_var, bgcol, element_color, highlight_color, alg_vars
+    global bg_color_btn, element_color_btn, highlight_color_btng
+
+    with open("settings.json", "r") as file:
+        settings = json.load(file)
+
+    array_size_var.set(settings["array_size"])
+    delay_var.set(settings["delay"])
+    randomize_var.set(settings["randomize"])
+
+    bgcol = settings["bgcol"]
+    element_color = settings["element_color"]
+    highlight_color = settings["highlight_color"]
+
+    # Update GUI
+    if bg_color_btn:
+        bg_color_btn.config(bg=bgcol)
+        element_color_btn.config(bg=element_color)
+        highlight_color_btn.config(bg=highlight_color)
+
+    for alg_name, var in settings["alg_vars"].items():
+        alg_vars[alg_name].set(var)
+
 def generateVisualizations():
     global alg_vars, array_size_var, delay_var, randomize_var, algorithms
     global bgcol, element_color, highlight_color
@@ -768,15 +810,6 @@ def generateVisualizations():
     root.mainloop()
 
 
-# Default settings
-array_size = 70
-delay = 0.01
-randomize = True
-
-bgcol = "white"
-element_color = "orange red"
-highlight_color = "peach puff"
-
 algorithms = {
     "Bubble Sort": bubbleSort,
     "Odd-Even Sort": oddEvenSort,
@@ -793,32 +826,48 @@ algorithms = {
     "Tim Sort": timSort,
     "Quick Sort": quickSortWrapper,
     "Intro Sort": introSort,
-    # "Bucket Sort": bucketSort,
-    # "Flash Sort": flashSort,
     "Radix Sort": radixSort,
 }
 
+# Settings
 settings_root = tk.Tk()
 settings_root.title("Sorting Algorithm Visualizer - Settings")
 settings_root.geometry("660x340")
+array_size_var = tk.IntVar(value=int())
+delay_var = tk.DoubleVar(value=float())
+randomize_var = tk.BooleanVar(value=bool())
+
+bgcol = str()
+element_color = str()
+highlight_color = str()
+
+# Placeholders for loadSettings
+bg_color_btn = None
+element_color_btn = None
+highlight_color_btn = None
+
+alg_vars = {}
+for alg_name in algorithms.keys():
+    var = tk.BooleanVar(value=False)
+    alg_vars[alg_name] = var
+
+loadSettings()
+
 
 settings_frame = tk.LabelFrame(settings_root, text="Visualization Settings", padx=10, pady=10, font=("Arial", 12))
 settings_frame.pack(fill=tk.X, padx=10, pady=10)
 
 # Array size
 tk.Label(settings_frame, text="Array Size:").grid(row=0, column=0, sticky="w")
-array_size_var = tk.IntVar(value=array_size)
 array_size_entry = tk.Spinbox(settings_frame, from_=5, to=200, textvariable=array_size_var, width=5)
 array_size_entry.grid(row=0, column=1, sticky="w", padx=5)
 
 # Delay
 tk.Label(settings_frame, text="Animation Delay (s):").grid(row=0, column=2, sticky="w", padx=(20, 0))
-delay_var = tk.DoubleVar(value=delay)
 delay_entry = tk.Spinbox(settings_frame, from_=0.01, to=2, increment=0.01, textvariable=delay_var, width=5)
 delay_entry.grid(row=0, column=3, sticky="w", padx=5)
 
 # Randomize option
-randomize_var = tk.BooleanVar(value=randomize)
 randomize_check = tk.Checkbutton(settings_frame, text="Randomize Arrays", variable=randomize_var)
 randomize_check.grid(row=0, column=4, sticky="w", padx=(20, 0))
 
@@ -845,16 +894,21 @@ alg_frame = tk.LabelFrame(settings_root, text="Select Algorithms to Compare", pa
 alg_frame.pack(fill=tk.X, padx=10, pady=10)
 
 # Create checkboxes for each algorithm
-alg_vars = {}
 for i, alg_name in enumerate(algorithms.keys()):
-    var = tk.BooleanVar(value=False)
-    alg_vars[alg_name] = var
-    cb = tk.Checkbutton(alg_frame, text=alg_name, variable=var)
+    cb = tk.Checkbutton(alg_frame, text=alg_name, variable=alg_vars[alg_name])
     cb.grid(row=i // 4, column=i % 4, sticky="w", padx=5, pady=2)
 
 generate_btn = tk.Button(settings_root, text="Generate Visualizations", 
                     command=generateVisualizations, font=("Arial", 12))
 generate_btn.pack(side=tk.LEFT, padx=5, pady=5)
+
+save_settings_btn = tk.Button(settings_root, text="Save Settings", 
+                    command=saveSettings, font=("Arial", 12))
+save_settings_btn.pack(side=tk.LEFT, padx=5, pady=5)
+
+load_settings_btn = tk.Button(settings_root, text="Load Settings", 
+                    command=loadSettings, font=("Arial", 12))
+load_settings_btn.pack(side=tk.LEFT, padx=5, pady=5)
 
 
 settings_root.mainloop()
