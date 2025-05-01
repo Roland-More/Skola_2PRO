@@ -2,9 +2,9 @@
     "array_size": 70,
     "delay": 0.01,
     "randomize": true,
-    "bgcol": "white",
-    "element_color": "orange red",
-    "highlight_color": "peach puff",
+    "bgcol": "#ffffff",
+    "element_color": "#ff490d",
+    "highlight_color": "#ffb379",
     "alg_vars": {
         "Bubble Sort": false,
         "Odd-Even Sort": false,
