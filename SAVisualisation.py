@@ -8,9 +8,13 @@ import json
 
 
 def bubbleSort(canvas, width, height, array, delay):
+    global visualization_active
+
     for i in range(len(array) - 1):
         swapped = False
         for j in range(len(array) - i - 1):
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [j, j+1])
             time.sleep(delay/2)
@@ -27,6 +31,8 @@ def bubbleSort(canvas, width, height, array, delay):
             return
 
 def oddEvenSort(canvas, width, height, array, delay):
+    global visualization_active
+
     n = len(array)
     sorted_ = False
 
@@ -34,6 +40,8 @@ def oddEvenSort(canvas, width, height, array, delay):
         sorted_ = True
 
         for i in range(1, n - 1, 2):
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [i, i+1])
             time.sleep(delay/2)
@@ -47,6 +55,8 @@ def oddEvenSort(canvas, width, height, array, delay):
                 time.sleep(delay)
 
         for i in range(0, n - 1, 2):
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [i, i+1])
             time.sleep(delay/2)
@@ -60,6 +70,8 @@ def oddEvenSort(canvas, width, height, array, delay):
                 time.sleep(delay)
 
 def cocktailSort(canvas, width, height, array, delay):
+    global visualization_active
+
     n = len(array)
     start = 0
     end = n - 1
@@ -69,6 +81,8 @@ def cocktailSort(canvas, width, height, array, delay):
         swapped = False
 
         for i in range(start, end):
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [i, i+1])
             time.sleep(delay/2)
@@ -88,6 +102,8 @@ def cocktailSort(canvas, width, height, array, delay):
         end -= 1
 
         for i in range(end - 1, start - 1, -1):
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [i, i+1])
             time.sleep(delay/2)
@@ -107,6 +123,8 @@ def pancakeSort(canvas, width, height, array, delay):
     
     # Perform pancake sort
     for curr_size in range(n, 1, -1):
+        if not visualization_active:
+                return
         # Find the index of the maximum element in arr[0...curr_size-1]
         max_idx = findMax(array, curr_size, canvas, width, height, delay)
         
@@ -124,9 +142,13 @@ def pancakeSort(canvas, width, height, array, delay):
         time.sleep(delay)
 
 def flip(arr, i, canvas, width, height, delay):
+    global visualization_active
     # Visualize the flip process step-by-step
     start = 0
     while start < i:
+        if not visualization_active:
+                return
+
         arr[start], arr[i] = arr[i], arr[start]  # Swap the elements
         # Visualize the array after each individual swap
         drawArray(canvas, width, height, arr, [start, i])
@@ -139,8 +161,13 @@ def flip(arr, i, canvas, width, height, delay):
     time.sleep(delay)
 
 def findMax(array, end, canvas, width, height, delay):
+    global visualization_active
+
     max_idx = 0
     for i in range(1, end):
+        if not visualization_active:
+                return
+
         if array[i] > array[max_idx]:
             max_idx = i
         # Visualize the comparison
@@ -153,6 +180,8 @@ def findMax(array, end, canvas, width, height, delay):
     return max_idx
 
 def combSort(canvas, width, height, array, delay):
+    global visualization_active
+
     def getNextGap(gap):
         gap = int(gap * 10 // 13)
         return max(1, gap)
@@ -166,6 +195,8 @@ def combSort(canvas, width, height, array, delay):
         swapped = False
 
         for i in range(n - gap):
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [i, i + gap])
             time.sleep(delay/2)
@@ -179,9 +210,13 @@ def combSort(canvas, width, height, array, delay):
                 time.sleep(delay)
 
 def selectionSort(canvas, width, height, array, delay):
+    global visualization_active
+
     for i in range(len(array)):
         min_pos = i
         for j in range(i, len(array)):
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [j, min_pos])
             time.sleep(delay/2)
@@ -199,10 +234,15 @@ def selectionSort(canvas, width, height, array, delay):
         time.sleep(delay)
 
 def gnomeSort(canvas, width, height, array, delay):
+    global visualization_active
+
     index = 0
     size = len(array)
 
     while index < size:
+        if not visualization_active:
+                return
+
         if index == 0:
             index += 1
             
@@ -223,7 +263,12 @@ def gnomeSort(canvas, width, height, array, delay):
             index -= 1
 
 def insertionSort(canvas, width, height, array, delay):
+    global visualization_active
+
     for i in range(1, len(array)):
+        if not visualization_active:
+            return
+
         key = array[i]
         
         # Key selection visualization
@@ -232,6 +277,8 @@ def insertionSort(canvas, width, height, array, delay):
 
         j = i - 1
         while j >= 0:
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [j, j+1])
             time.sleep(delay/2)
@@ -254,11 +301,19 @@ def insertionSort(canvas, width, height, array, delay):
         time.sleep(delay)
     
 def shellSort(canvas, width, height, array, delay):
+    global visualization_active
+
     n = len(array)
     gap = n // 2
 
     while gap > 0:
+        if not visualization_active:
+                return
+
         for i in range(gap, n):
+            if not visualization_active:
+                return
+            
             temp = array[i]
             j = i
             
@@ -268,6 +323,9 @@ def shellSort(canvas, width, height, array, delay):
             
             # Optimize by combining comparison and assignment in one loop
             while j >= gap and array[j - gap] > temp:
+                if not visualization_active:
+                    return
+
                 array[j] = array[j - gap]
                 j -= gap
                 
@@ -288,6 +346,11 @@ def stoogeSortWrapper(canvas, width, height, array, delay):
     stoogeSort(canvas, width, height, array, 0, len(array) - 1, delay)
 
 def stoogeSort(canvas, width, height, array, l, h, delay):
+    global visualization_active
+
+    if not visualization_active:
+        return
+
     if l >= h:
         return
 
@@ -312,12 +375,16 @@ def heapSortWrapper(canvas, width, height, array, delay):
     heapSort(canvas, width, height, array, 0, len(array) - 1, delay)
 
 def heapSort(canvas, width, height, array, low, high, delay):
+    global visualization_active
+
     n = high + 1
 
     for i in range(n // 2 - 1, low - 1, -1):
         heapify(canvas, width, height, array, n, i, delay)
 
     for i in range(n - 1, low - 1, -1):
+        if not visualization_active:
+            return
         # Swap visualization
         array[i], array[low] = array[low], array[i]
         drawArray(canvas, width, height, array, [low, i])
@@ -326,6 +393,11 @@ def heapSort(canvas, width, height, array, low, high, delay):
         heapify(canvas, width, height, array, i, low, delay)
 
 def heapify(canvas, width, height, array, n, i, delay):
+    global visualization_active
+
+    if not visualization_active:
+        return
+
     largest = i
     left = 2 * i + 1
     right = 2 * i + 2
@@ -358,19 +430,28 @@ def mergeSortWrapper(canvas, width, height, array, delay):
     mergeSort(canvas, width, height, array, 0, len(array) - 1, delay)
 
 def mergeSort(canvas, width, height, array, l, r, delay):
+    global visualization_active
+
+    if not visualization_active:
+        return
+
     if l < r:
         m = (l + r) // 2
         mergeSort(canvas, width, height, array, l, m, delay)
         mergeSort(canvas, width, height, array, m+1, r, delay)
         merge(canvas, width, height, array, l, m, r, delay)
 
-def merge(canvas, width, height, array, l, m, r, delay):  
+def merge(canvas, width, height, array, l, m, r, delay):
+    global visualization_active
+
     left = array[l:m+1]
     right = array[m+1:r+1]
     i = j = 0
     k = l
 
     while i < len(left) and j < len(right):
+        if not visualization_active:
+            return
         # Comparison visualization
         drawArray(canvas, width, height, array, [l+i, m+1+j])
         time.sleep(delay/2)
@@ -389,6 +470,9 @@ def merge(canvas, width, height, array, l, m, r, delay):
         k += 1
 
     while i < len(left):
+        if not visualization_active:
+            return
+
         array[k] = left[i]
 
         # Assignment visualization
@@ -399,6 +483,9 @@ def merge(canvas, width, height, array, l, m, r, delay):
         k += 1
 
     while j < len(right):
+        if not visualization_active:
+            return
+
         array[k] = right[j]
 
         # Assignment visualization
@@ -409,12 +496,17 @@ def merge(canvas, width, height, array, l, m, r, delay):
         k += 1
 
 def timSort(canvas, width, height, array, delay):
+    global visualization_active
+
     n = len(array)
     min_run = getMinRun(n)
 
     runs = []
     i = 0
     while i < n:
+        if not visualization_active:
+            return
+        
         run_start = i
         run_end = i + 1
 
@@ -426,6 +518,9 @@ def timSort(canvas, width, height, array, delay):
             
             if array[run_end] < array[run_start]:
                 while run_end < n:
+                    if not visualization_active:
+                        return
+                    
                     if run_end + 1 < n:
                         # Comparison visualization
                         drawArray(canvas, width, height, array, [run_end, run_end+1])
@@ -442,12 +537,18 @@ def timSort(canvas, width, height, array, delay):
                 temp = array[run_start:run_end]
                 temp.reverse()
                 for idx, val in enumerate(temp):
+                    if not visualization_active:
+                        return
+                    
                     array[run_start + idx] = val
                     # Assignment visualization
                     drawArray(canvas, width, height, array, [run_start + idx])
                     time.sleep(delay/2)
             else:
                 while run_end < n:
+                    if not visualization_active:
+                        return
+
                     if run_end + 1 < n:
                         # Comparison visualization
                         drawArray(canvas, width, height, array, [run_end, run_end+1])
@@ -467,8 +568,14 @@ def timSort(canvas, width, height, array, delay):
         i = actual_end
 
     while len(runs) > 1:
+        if not visualization_active:
+            return
+
         new_runs = []
         for i in range(0, len(runs) - 1, 2):
+            if not visualization_active:
+                return
+
             if i + 1 < len(runs):
                 l, m = runs[i][0], runs[i][1] - 1
                 r = runs[i+1][1] - 1
@@ -482,14 +589,24 @@ def timSort(canvas, width, height, array, delay):
         runs = new_runs
 
 def getMinRun(n):
+    global visualization_active
+
     r = 0
     while n >= 64:
+        if not visualization_active:
+            return
+
         r |= n & 1
         n >>= 1
     return n + r
 
 def insertionSortPartial(canvas, width, height, array, left, right, delay):
+    global visualization_active
+
     for i in range(left + 1, right):
+        if not visualization_active:
+            return
+            
         key = array[i]
         
         # Key selection visualization
@@ -498,6 +615,8 @@ def insertionSortPartial(canvas, width, height, array, left, right, delay):
         
         j = i - 1
         while j >= left:
+            if not visualization_active:
+                return
             # Comparison visualization
             drawArray(canvas, width, height, array, [j, j+1])
             time.sleep(delay/2)
@@ -622,7 +741,10 @@ def randomizeArray(canvases, width, height, arrays):
 
 def drawArray(canvas, width, height, array, positions):
     def draw():
-        global element_color, highlight_color, bgcol
+        global element_color, highlight_color, bgcol, visualization_active
+
+        if not visualization_active:
+            return
 
         size = len(array)
         spacing = width / size # Space inbetween columns
@@ -720,7 +842,7 @@ def loadSettings():
         pass
 
 def generateVisualizations():
-    global alg_vars, array_size_var, delay_var, randomize_var, algorithms
+    global alg_vars, array_size_var, delay_var, randomize_var, algorithms, visualization_active
     global bgcol, element_color, highlight_color, active_threads
 
     # Set up variables for rendering
@@ -802,10 +924,11 @@ def generateVisualizations():
     
     # Set up the window close handler
     def on_close():
-        global active_threads
+        global active_threads, visualization_active
 
         active_threads = []
         root.destroy()
+        visualization_active = False
     
     root.protocol("WM_DELETE_WINDOW", on_close)
 
@@ -835,13 +958,18 @@ def generateVisualizations():
         buttonrall = tk.Button(root, text="Randomize All", font=("Arial", 16), command=lambda: randomizeArray(canvases, width, height, arrays))
         buttonrall.grid(row=rows*3, column=1, pady=5)
 
+    visualization_active = True
+
 # Handle cleanup when the settings window is closed
 def on_settings_close():
-    global active_threads
+    global active_threads, visualization_active
 
     active_threads = []
     settings_root.destroy()
+    visualization_active = False
 
+
+visualization_active = False
 
 algorithms = {
     "Bubble Sort": bubbleSort,
