@@ -658,10 +658,17 @@ def partition(canvas, width, height, array, low, high, delay):
     if not visualization_active:
         return
 
+    mid = (low + high) // 2
+    pivot_candidates = [(array[low], low), (array[mid], mid), (array[high], high)]
+    pivot_candidates.sort(key=lambda x: x[0])
+    pivot_index = pivot_candidates[1][1]
+
+    array[pivot_index], array[high] = array[high], array[pivot_index]  # Move pivot to end
     pivot = array[high]
+
     i = low - 1
 
-    # Pivot visualization
+    # # Pivot visualization
     drawArray(canvas, width, height, array, [high])
     time.sleep(delay/2)
 
@@ -1050,16 +1057,16 @@ settings = {
     "alg_vars": {}
 }
 
-# Placeholders for loadSettings
-bg_color_btn = None
-element_color_btn = None
-highlight_color_btn = None
-
 alg_vars = {}
 for alg_name in algorithms.keys():
     var = tk.BooleanVar(value=False)
     alg_vars[alg_name] = var
     settings["alg_vars"][alg_name] = False
+
+# Placeholders for loadSettings
+bg_color_btn = None
+element_color_btn = None
+highlight_color_btn = None
 
 # Try to load settings, but use defaults if it fails
 loadSettings()
