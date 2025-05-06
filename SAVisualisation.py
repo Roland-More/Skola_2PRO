@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import Canvas, colorchooser, messagebox
 import threading
-import time
 import random
+import time
 import math
 import json
 
@@ -642,12 +642,22 @@ def quickSortWrapper(canvas, width, height, array, delay):
     quickSort(canvas, width, height, array, 0, len(array) - 1, delay)
 
 def quickSort(canvas, width, height, array, low, high, delay):
+    global visualization_active
+
+    if not visualization_active:
+        return
+
     if low < high:
         pi = partition(canvas, width, height, array, low, high, delay)
         quickSort(canvas, width, height, array, low, pi - 1, delay)
         quickSort(canvas, width, height, array, pi + 1, high, delay)
 
 def partition(canvas, width, height, array, low, high, delay):
+    global visualization_active
+
+    if not visualization_active:
+        return
+
     pivot = array[high]
     i = low - 1
 
@@ -656,6 +666,8 @@ def partition(canvas, width, height, array, low, high, delay):
     time.sleep(delay/2)
 
     for j in range(low, high):
+        if not visualization_active:
+            return
         # Comparison visualization
         drawArray(canvas, width, height, array, [j, high])
         time.sleep(delay/2)
@@ -676,10 +688,17 @@ def partition(canvas, width, height, array, low, high, delay):
     return i + 1
 
 def introSort(canvas, width, height, array, delay):
+    global visualization_active
+
     max_depth = int(math.log2(len(array)) * 2)
     introSortHelper(canvas, width, height, array, 0, len(array) - 1, max_depth, delay)
 
 def introSortHelper(canvas, width, height, array, low, high, max_depth, delay):
+    global visualization_active
+
+    if not visualization_active:
+        return
+    
     if low < high:
         # Depth check visualization
         drawArray(canvas, width, height, array, [low, high])
@@ -691,15 +710,25 @@ def introSortHelper(canvas, width, height, array, low, high, max_depth, delay):
             pi = partition(canvas, width, height, array, low, high, delay)
             introSortHelper(canvas, width, height, array, low, pi - 1, max_depth - 1, delay)
             introSortHelper(canvas, width, height, array, pi + 1, high, max_depth - 1, delay)
-
+ 
 def radixSort(canvas, width, height, array, delay):
+    global visualization_active
+
     def countingSort(exp):
+        global visualization_active
+
+        if not visualization_active:
+            return
+        
         n = len(array)
         output = [0] * n
         count = [0] * 10
 
         # Step 1: Count digit frequencies
         for i in range(n):
+            if not visualization_active:
+                return
+            
             index = (array[i] // exp) % 10
             count[index] += 1
 
@@ -710,6 +739,9 @@ def radixSort(canvas, width, height, array, delay):
         # Step 3: Build output array from right to left (stable)
         i = n - 1
         while i >= 0:
+            if not visualization_active:
+                return
+            
             index = (array[i] // exp) % 10
             output[count[index] - 1] = array[i]
             count[index] -= 1
@@ -717,6 +749,9 @@ def radixSort(canvas, width, height, array, delay):
 
         # Step 4: Copy back to original array with visualization
         for i in range(n):
+            if not visualization_active:
+                return
+            
             array[i] = output[i]
             drawArray(canvas, width, height, array, [i])
             time.sleep(delay/2)
@@ -1007,7 +1042,7 @@ highlight_color = "#e74c3c"  # Red
 # Create default settings if not loaded
 settings = {
     "array_size": 50,
-    "delay": 0.05,
+    "delay": 0.02,
     "randomize": True,
     "bgcol": bgcol,
     "element_color": element_color,
